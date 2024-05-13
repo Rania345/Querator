@@ -26,31 +26,31 @@ export default function HomeComponent() {
     useState<boolean>(false);
 
   useEffect(() => {
-    // fetch('https://jsonplaceholder.typicode.com/photos')
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((data) => {
-    //     setQueries(data);
-    //   });
-    setQueries([
-      {
-        title: "Best seller of the month",
-        question: "What was the best seller of the last month?",
-      },
-      {
-        title: "Best seller of the year",
-        question: "What was the best seller of the last month?",
-      },
-      {
-        title: "Top 10 sellers of the month",
-        question: "What are the top 10 selling products of the last month?",
-      },
-      {
-        title: "Top 10 sellers of the year",
-        question: "What are the top 10 selling products of the last year?",
-      },
-    ]);
+    fetch('http://localhost:8000/api/queries/')
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setQueries(data);
+      });
+    // setQueries([
+    //   {
+    //     title: "Best seller of the month",
+    //     question: "What was the best seller of the last month?",
+    //   },
+    //   {
+    //     title: "Best seller of the year",
+    //     question: "What was the best seller of the last month?",
+    //   },
+    //   {
+    //     title: "Top 10 sellers of the month",
+    //     question: "What are the top 10 selling products of the last month?",
+    //   },
+    //   {
+    //     title: "Top 10 sellers of the year",
+    //     question: "What are the top 10 selling products of the last year?",
+    //   },
+    // ]);
   }, []);
   const deleteQuery = () => {
     setConfirmDeleteQueryDialogOpen(true);
