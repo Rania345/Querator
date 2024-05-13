@@ -14,7 +14,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 # register the router
-router.register(r'queries',views.QueryView, 'query')
+router.register(r'queries',views.QueryView, 'query') 
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
@@ -22,7 +22,10 @@ urlpatterns = [
 	# add another path to the url patterns
 	# when you visit the localhost:8000/api
 	# you should be routed to the django Rest framework
-	path('api/', include(router.urls))
+	path('api/', include(router.urls)), 
+    
+    # answer 
+    path('api/answer', views.answer, name='answer'), 
 
 
 ]
