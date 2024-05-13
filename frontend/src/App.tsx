@@ -1,26 +1,54 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useMemo, useState, createContext } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import HomeComponent from "./components/HomeComponent";
+import MenuBarComponent from "./components/MenuBarComponent";
 
-function App() {
+const ColorModeContext = createContext({ toggleColorMode: () => {} });
+
+export default function App() {
+  const [mode, setMode] = useState<"light" | "dark">("light");
+  const colorMode = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+      },
+    }),
+    []
+  );
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+        },
+      }),
+    [mode]
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <ColorModeContext.Provider value={colorMode}>
+      {/* tslint:disable */}
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            // alignItems: "flex-start",
+            justifyContent: "flex-start",
+            bgcolor: "background.default",
+            color: "text.primary",
+            minHeight: '100vh',
+            // p: 2,
+            m: 0,
+          }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <MenuBarComponent onThemeChange={setMode} />
+          <HomeComponent />
+        </Box>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
-
-export default App;
