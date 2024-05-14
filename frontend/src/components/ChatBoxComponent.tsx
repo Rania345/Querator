@@ -53,15 +53,31 @@ export default function ChatBoxComponent() {
   };
   //   const submitQuestion = (question: string) => {
   const submitQuestion = () => {
-    // console.log(question);
-    setMessages([
-      ...messages,
-      {
-        content: "New Question",
-        type: "text",
-        direction: "out",
+    fetch("http://localhost:8000/api/answer_question/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    ]);
+      body: JSON.stringify({
+        question: "question text",
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+
+        setMessages([
+          ...messages,
+          {
+            content: "New Question",
+            type: "text",
+            direction: "out",
+          },
+        ]);
+      });
+    // console.log(question);
   };
 
   return (

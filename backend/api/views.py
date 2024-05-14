@@ -1,8 +1,8 @@
-from django.shortcuts import render
 from django.http import HttpResponse
-from django.views import View
-# import view sets from the REST framework
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
+import json
 
 # import the QuerySerializer from the serializer file
 from .serializers import QuerySerializer
@@ -12,19 +12,18 @@ from .models import Query
 
 # create a class for the Query model viewsets
 class QueryView(viewsets.ModelViewSet):
+    # create a serializer class and
+    # assign it to the QuerySerializer class
+    serializer_class = QuerySerializer
 
-	# create a serializer class and 
-	# assign it to the QuerySerializer class
-	serializer_class = QuerySerializer
+    # define a variable and populate it
+    # with the Query list objects
+    queryset = Query.objects.all()
 
-	# define a variable and populate it 
-	# with the Query list objects
-	queryset = Query.objects.all()
-      
 
 # handle questions	
-def get_answer(prompt): 
-    print(prompt) 
+def get_answer(prompt):
+    print(prompt)
     # query = openai.Completion.create( 
     #     engine="text-davinci-003", 
     #     prompt=prompt, 
@@ -33,19 +32,21 @@ def get_answer(prompt):
     #     stop=None, 
     #     temperature=0.5, 
     # ) 
-  
+
     # response = query.choices[0].text 
     response = "chatgpt response"
-    print(response) 
-    return response 
+    print(response)
+    return response
 
-def answer(request):
-    if request.method == 'POST':
-        data =  {
-            "brand": "Ford",
-            "model": "Mustang",
-            "year": 1964
-        }
-        return JsonResponse(data)
-    else:
-        return HttpResponse(status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def answer_question(request):
+    data = {
+        "id": 123,
+        "question": "Ford",
+        "title": "Mustang"
+    }
+
+    json_object = json.dumps(data)
+    return HttpResponse(json_object)

@@ -11,3 +11,4 @@ class QuerySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Query
 		fields = ('id', 'title','question')
+
