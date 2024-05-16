@@ -37,14 +37,11 @@ def generate_sql_query(prompt):
 
     # response = query.choices[0].text 
     response = """
-    SELECT AVG(total_order_value) AS average_order_value
-    FROM (
-        SELECT o.id AS order_id, SUM(od.quantity * p.unit_price) AS total_order_value
-        FROM orders o
-        JOIN order_details od ON o.id = od.order_id
-        JOIN products p ON od.product_id = p.id
-        GROUP BY o.id
-    ) AS order_values;
+    SELECT p.id AS product_id, p.product_name, p.category, SUM(od.quantity) AS total_quantity_sold
+    FROM products p
+    JOIN order_details od ON p.id = od.product_id
+    GROUP BY p.id, p.product_name, p.category
+    ORDER BY total_quantity_sold DESC;
     """
     return response
 
