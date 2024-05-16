@@ -55,6 +55,9 @@ def answer_question(request):
     cursor = connection.cursor()
     query = generate_sql_query(post_data.get("question"))
     cursor.execute(query)
-    rows = cursor.fetchall()
-    json_object = json.dumps(rows)
+    # rows = cursor.fetchall()
+    # columns = [i[0] for i in cursor.description]
+    fields = [field_md[0] for field_md in cursor.description]
+    result = [dict(zip(fields, row)) for row in cursor.fetchall()]
+    json_object = json.dumps(result)
     return HttpResponse(json_object)

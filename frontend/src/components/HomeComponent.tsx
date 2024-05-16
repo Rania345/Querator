@@ -26,31 +26,13 @@ export default function HomeComponent() {
     useState<boolean>(false);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/queries/')
+    fetch("http://localhost:8000/api/queries/")
       .then((res) => {
         return res.json();
       })
       .then((data) => {
         setQueries(data);
       });
-    // setQueries([
-    //   {
-    //     title: "Best seller of the month",
-    //     question: "What was the best seller of the last month?",
-    //   },
-    //   {
-    //     title: "Best seller of the year",
-    //     question: "What was the best seller of the last month?",
-    //   },
-    //   {
-    //     title: "Top 10 sellers of the month",
-    //     question: "What are the top 10 selling products of the last month?",
-    //   },
-    //   {
-    //     title: "Top 10 sellers of the year",
-    //     question: "What are the top 10 selling products of the last year?",
-    //   },
-    // ]);
   }, []);
   const deleteQuery = () => {
     setConfirmDeleteQueryDialogOpen(true);
@@ -61,8 +43,11 @@ export default function HomeComponent() {
   };
 
   const toggleOpenChatBox = () => {
-    console.log("toggleOpenChatBox");
     setChatBoxOpen(!chatBoxOpen);
+  };
+
+  const executeQuery = (question: string) => {
+    console.log(question);
   };
 
   return (
@@ -78,7 +63,7 @@ export default function HomeComponent() {
         flexWrap="wrap"
       >
         {queries.map((query) => (
-          <Card sx={{ width: "30%" }}>
+          <Card key={query.id} sx={{ width: "30%" }}>
             <CardHeader
               action={
                 <IconButton aria-label="settings" onClick={deleteQuery}>
@@ -88,7 +73,7 @@ export default function HomeComponent() {
               title={query.title}
             />
 
-            <CardContent>
+            <CardContent onClick={() => executeQuery(query.question)}>
               <Typography variant="body2" color="text.secondary">
                 {query.question}
               </Typography>
@@ -103,7 +88,7 @@ export default function HomeComponent() {
       >
         <Fab
           color="primary"
-          aria-lbale="Ask a Question"
+          aria-label="Ask a Question"
           onClick={toggleOpenChatBox}
         >
           <QuestionAnswer />

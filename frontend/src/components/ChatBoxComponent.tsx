@@ -12,33 +12,20 @@ import SendIcon from "@mui/icons-material/Send";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
+import { DataGrid } from "@mui/x-data-grid";
 
 export default function ChatBoxComponent() {
   const [messages, setMessages] = useState<any[]>([]);
+  const [inputValue, setInputValue] = useState<String>("");
   const [saveQueryDialogOpen, setSaveQueryDialogOpen] =
     useState<boolean>(false);
 
   useEffect(() => {
     setMessages([
       {
-        content: "Best seller of the month",
-        // question: 'What was the best seller of the last month?',
+        content: "Hello! How can I assist you today?",
         direction: "in",
-      },
-      {
-        content: "Best seller of the year",
-        // question: 'What was the best seller of the last month?',
-        direction: "out",
-      },
-      {
-        content: "Top 10 sellers of the month",
-        // question: 'What are the top 10 selling products of the last month?',
-        direction: "in",
-      },
-      {
-        content: "Top 10 sellers of the year",
-        // question: 'What are the top 10 selling products of the last year?',
-        direction: "out",
       },
     ]);
   }, []);
@@ -51,33 +38,51 @@ export default function ChatBoxComponent() {
   const confirmSaveQuery = (question: string) => {
     setSaveQueryDialogOpen(false);
   };
-  //   const submitQuestion = (question: string) => {
+
   const submitQuestion = () => {
+    // const submitQuestion = () => {
+    if (!inputValue) {
+      return;
+    }
+    const currentMessages = [...messages];
+    currentMessages.push(
+      {
+        content: inputValue,
+        type: "text",
+        direction: "out",
+      },
+      {
+        content: "",
+        type: "loading",
+        direction: "in",
+      }
+    );
+    setMessages([...currentMessages]);
+
     fetch("http://localhost:8000/api/answer_question/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        question: "question text",
+        question: inputValue,
       }),
     })
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
-
-        setMessages([
-          ...messages,
-          {
-            content: "New Question",
-            type: "text",
-            direction: "out",
-          },
-        ]);
+        currentMessages[currentMessages.length - 1] = {
+          content: data,
+          type: "table",
+          direction: "in",
+        };
+        setMessages([...currentMessages]);
+      })
+      .catch(() => {
+        currentMessages.pop();
+        setMessages([...currentMessages]);
       });
-    // console.log(question);
   };
 
   return (
@@ -100,16 +105,36 @@ export default function ChatBoxComponent() {
               padding: 1,
               border: 1,
               borderRadius: 2,
-              bgcolor: message.direction === "in" ? "info.light" : null,
+              bgcolor: message.direction === "out" ? "info.light" : null,
               borderColor:
-                message.direction === "out" ? "grey.300" : "info.light",
+                message.direction === "out" ? "info.light" : "grey.300",
               justifyContent: "space-between",
               maxWidth: "90%",
               alignSelf: message.direction === "in" ? "start" : "end",
               flexGrow: 1,
             }}
           >
-            <Typography variant="body2">{message.content}</Typography>
+            {(() => {
+              switch (message.type) {
+                case "table":
+                  return (
+                    <DataGrid
+                      rows={message.content}
+                      columns={Object.keys(message.content[0]).map((field) => ({
+                        field,
+                      }))}
+                    />
+                  );
+                case "loading":
+                  return <LinearProgress variant="indeterminate" />;
+                default:
+                  return (
+                    <Typography variant="body2" color="text.secondary">
+                      {message.content}
+                    </Typography>
+                  );
+              }
+            })()}
             {message.direction === "out" && (
               <IconButton
                 aria-label="Save Question"
@@ -123,10 +148,11 @@ export default function ChatBoxComponent() {
         ))}
       </Stack>
       <TextField
-        // label="With normal TextField"
         id="standard-start-adornment"
         sx={{ m: 1 }}
         size="small"
+        value={inputValue}
+        onChange={(evt) => setInputValue(evt.target.value)}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -147,8 +173,13 @@ export default function ChatBoxComponent() {
         <DialogTitle id="alert-dialog-title">Save Query</DialogTitle>
         <DialogContent>
           <Box sx={{ flexDirection: "column" }}>
-            <TextField label="Title" sx={{ m: 1 }} />
-            <TextField label="Question" sx={{ m: 1 }} />
+            <TextField fullWidth={true} label="Title" sx={{ m: 1 }} />
+            <TextField
+              fullWidth={true}
+              label="Question"
+              sx={{ m: 1 }}
+              multiline
+            />
           </Box>
         </DialogContent>
         <DialogActions>
