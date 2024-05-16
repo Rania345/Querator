@@ -9,7 +9,7 @@ import json
 from .serializers import QuerySerializer
 
 # import the Query model from the models file
-from .models import Query
+from .models import Query, Customer
 
 
 # create a class for the Query model viewsets
@@ -36,8 +36,16 @@ def generate_sql_query(prompt):
     # ) 
 
     # response = query.choices[0].text 
-    response = "SELECT * FROM queries"
-    print(response)
+    response = """
+    SELECT AVG(total_order_value) AS average_order_value
+    FROM (
+        SELECT o.id AS order_id, SUM(od.quantity * p.unit_price) AS total_order_value
+        FROM orders o
+        JOIN order_details od ON o.id = od.order_id
+        JOIN products p ON od.product_id = p.id
+        GROUP BY o.id
+    ) AS order_values;
+    """
     return response
 
 

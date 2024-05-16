@@ -119,10 +119,17 @@ export default function ChatBoxComponent() {
                 case "table":
                   return (
                     <DataGrid
-                      rows={message.content}
-                      columns={Object.keys(message.content[0]).map((field) => ({
-                        field,
+                      rows={(message.content || []).map((row: any, i: number) => ({
+                        ...row,
+                        id: i,
                       }))}
+                      columns={
+                        message?.content?.length
+                          ? Object.keys(message.content[0]).map((field) => ({
+                              field,
+                            }))
+                          : []
+                      }
                     />
                   );
                 case "loading":
@@ -170,7 +177,7 @@ export default function ChatBoxComponent() {
 
       {/* Confirm delete dialog */}
       <Dialog maxWidth="sm" open={saveQueryDialogOpen} onClose={saveQuery}>
-        <DialogTitle id="alert-dialog-title">Save Query</DialogTitle>
+        <DialogTitle>Save Query</DialogTitle>
         <DialogContent>
           <Box sx={{ flexDirection: "column" }}>
             <TextField fullWidth={true} label="Title" sx={{ m: 1 }} />
