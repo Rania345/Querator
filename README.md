@@ -8,7 +8,7 @@
 
 
 # Backend
-`cd C:\Users\rantr\Desktop\Querator2\backend`
+`cd C:\Users\rantr\Desktop\Alx\Querator\backend`
 - Seed data base initial data 
 `python manage.py seed --mode=refresh`
 - make migration
